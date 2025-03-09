@@ -160,12 +160,12 @@ class LevelCompleteScene extends Phaser.Scene {
         
         for (let i = 0; i < totalProblems; i++) {
             const xPos = centerX - ((totalProblems - 1) * 25) + (i * 50);
-            const star = this.add.star(
+            
+            // Use circle shapes instead of stars to avoid tint issues
+            const star = this.add.circle(
                 xPos, 
                 200, 
-                5, 
-                10, 
-                20, 
+                15, 
                 i < GameData.stars ? 0xFFD700 : 0xCCCCCC
             );
             
@@ -174,14 +174,13 @@ class LevelCompleteScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: star,
                     scale: { from: 0, to: 1 },
-                    angle: { from: 0, to: 360 },
                     duration: 500,
                     delay: i * 200,
                     ease: 'Back.out'
                 });
             }
         }
-    }
+    }    
     
     createLearnedSection(levelData) {
         // Add a box showing what the player learned in this level

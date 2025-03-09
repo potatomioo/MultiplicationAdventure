@@ -319,22 +319,16 @@ class GameScene extends Phaser.Scene {
             }
         );
         
-        // Progress stars
+        // Progress stars - using circles instead of star shapes to avoid tint issues
         this.starsGroup = this.add.group();
         for (let i = 0; i < GameData.levelConfig[GameData.level - 1].problemsToSolve; i++) {
-            const star = this.add.star(
+            // Use circles instead of stars to avoid the setTint issue
+            const star = this.add.circle(
                 300 + (i * 40), 
                 30, 
-                5, 
-                7, 
                 15, 
-                0xFFD700
+                i < this.problemsSolved ? 0xFFD700 : 0x555555
             );
-            
-            // Grey out stars not yet earned
-            if (i >= this.problemsSolved) {
-                star.setTint(0x555555);
-            }
             
             this.starsGroup.add(star);
         }
@@ -731,7 +725,8 @@ class GameScene extends Phaser.Scene {
             // Update star visuals
             const stars = this.starsGroup.getChildren();
             if (stars[this.problemsSolved - 1]) {
-                stars[this.problemsSolved - 1].clearTint();
+                // Change color instead of using setTint
+                stars[this.problemsSolved - 1].fillColor = 0xFFD700;
                 
                 // Add a little animation to the star
                 this.tweens.add({
@@ -754,7 +749,9 @@ class GameScene extends Phaser.Scene {
             // Check if level is complete
             if (this.problemsSolved >= GameData.levelConfig[GameData.level - 1].problemsToSolve) {
                 // Stop timer
-                this.timer.remove();
+                if (this.timer) {
+                    this.timer.remove();
+                }
                 
                 // Wait a moment before transitioning
                 this.time.delayedCall(2000, () => {
@@ -938,25 +935,33 @@ class GameScene extends Phaser.Scene {
     }
     
     showCelebrationEffect() {
-        // Create celebration particles
-        const particles = this.add.particles('particle');
+        // Create celebration effect using basic shapes instead of particles
+        const particleCount = 30;
+        const particles = [];
         
-        // Create emitter
-        const emitter = particles.createEmitter({
-            speed: { min: 100, max: 200 },
-            angle: { min: 0, max: 360 },
-            scale: { start: 1, end: 0 },
-            lifespan: 800,
-            quantity: 50,
-            blendMode: 'ADD'
-        });
-        
-        // Emit from character position
-        emitter.setPosition(120 + this.characterPosition, 435);
-        
-        // Auto-destroy after 1 second
-        this.time.delayedCall(1000, () => {
-            particles.destroy();
-        });
+        for (let i = 0; i < particleCount; i++) {
+            // Create a small colored circle as a particle
+            const color = Phaser.Math.RND.pick([0xFF0000, 0x00FF00, 0x0000FF, 0xFFFF00, 0xFF00FF]);
+            const size = Phaser.Math.Between(2, 6);
+            const x = 120 + this.characterPosition;
+            const y = 435;
+            
+            const particle = this.add.circle(x, y, size, color);
+            particles.push(particle);
+            
+            // Animate the particle flying outward
+            this.tweens.add({
+                targets: particle,
+                x: x + Phaser.Math.Between(-100, 100),
+                y: y + Phaser.Math.Between(-100, 100),
+                alpha: 0,
+                scale: { from: 1, to: 0 },
+                duration: Phaser.Math.Between(500, 1000),
+                ease: 'Quad.out',
+                onComplete: () => {
+                    particle.destroy();
+                }
+            });
+        }
     }
 }

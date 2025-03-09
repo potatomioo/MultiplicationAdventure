@@ -37,22 +37,19 @@ class PreloadScene extends Phaser.Scene {
             loadingText.destroy();
         });
         
-        // In a real game, we would load assets here
-        // Since we're creating everything with code, we'll just simulate loading
-        for (let i = 0; i < 100; i++) {
-            this.load.spritesheet('dummy' + i, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', { 
-                frameWidth: 1, 
-                frameHeight: 1 
-            });
-        }
+        // Instead of trying to load dummy assets, just simulate a delay
+        // This avoids CORS errors with about:blank
     }
 
     create() {
         // Create animal animation data
         this.createAnimationData();
         
-        // Start with menu scene
-        this.scene.start('MenuScene');
+        // Simulate loading completion with a small delay
+        this.time.delayedCall(500, () => {
+            // Start with menu scene
+            this.scene.start('MenuScene');
+        });
     }
     
     createAnimationData() {
