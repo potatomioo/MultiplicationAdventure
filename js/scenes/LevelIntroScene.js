@@ -187,7 +187,8 @@ class LevelIntroScene extends Phaser.Scene {
         // Create animal based on level
         if (GameData.level === 1) {
             // Create fox guide
-            animalGroup = this.createFox(600, 400, levelData.animalColor);
+            animalGroup = this.createFox(200, 300, levelData.animalColor);
+            
         } else if (GameData.level === 2) {
             // Create eagle guide
             animalGroup = this.createEagle(600, 400, levelData.animalColor);

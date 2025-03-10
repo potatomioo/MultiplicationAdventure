@@ -28,7 +28,7 @@ class MenuScene extends Phaser.Scene {
         // Create start button
         const startButton = this.add.rectangle(
             this.cameras.main.width / 2,
-            300,
+            250,
             200,
             60,
             0x4CAF50
@@ -37,7 +37,7 @@ class MenuScene extends Phaser.Scene {
         // Add button text
         const startText = this.add.text(
             this.cameras.main.width / 2, 
-            300, 
+            250, 
             'Start Adventure', 
             { 
                 font: '24px Arial',
