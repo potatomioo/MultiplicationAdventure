@@ -9,8 +9,16 @@ class LevelCompleteScene extends Phaser.Scene {
         const completedLevelData = GameData.levelConfig[GameData.level - 1];
         const nextLevelData = GameData.levelConfig[GameData.level];
         
-        // Add a more interesting gradient background instead of a solid color
-        this.createGradientBackground(0x4a90e2, 0x8e44ad); // Blue to purple gradient
+        // Add background image with gradient overlay
+        let backgroundKey;
+        if (GameData.level === 1) backgroundKey = 'forest_bg';
+        else if (GameData.level === 2) backgroundKey = 'canyon_bg';
+        else backgroundKey = 'mountain_bg';
+        
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, backgroundKey)
+            .setOrigin(0.5)
+            .setScale(this.cameras.main.width / 800, this.cameras.main.height / 600)
+            .setAlpha(0.6); // More transparent for better visibility of UI
         
         // Add animated background elements
         this.createBackgroundElements();
@@ -497,7 +505,7 @@ class LevelCompleteScene extends Phaser.Scene {
         
         this.add.text(
             this.cameras.main.width / 2, 
-            495, // Changed from 500 to 495 to avoid overlap
+            495, // Changed from 500 to 495 to avoid overlap with continue button
             nextLevelData.focus, 
             { 
                 font: 'italic 18px Arial',

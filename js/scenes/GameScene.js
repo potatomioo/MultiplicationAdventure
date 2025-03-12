@@ -19,17 +19,18 @@ class GameScene extends Phaser.Scene {
     create() {
         const levelData = GameData.levelConfig[GameData.level - 1];
         
-        // Create background
-        this.add.rectangle(
-            this.cameras.main.width / 2,
-            this.cameras.main.height / 2,
-            this.cameras.main.width,
-            this.cameras.main.height,
-            levelData.backgroundColor
-        );
+        // Set background based on level
+        let backgroundKey;
+        if (GameData.level === 1) backgroundKey = 'forest_bg';
+        else if (GameData.level === 2) backgroundKey = 'canyon_bg';
+        else backgroundKey = 'mountain_bg';
         
-        // Add decorative elements
-        this.createEnvironment(levelData);
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, backgroundKey)
+            .setOrigin(0.5)
+            .setScale(this.cameras.main.width / 3000, this.cameras.main.height / 3000); // Adjust scale to fit screen
+        
+        // Add environment objects based on level theme
+        this.createEnvironment();
         
         // Add UI panel for problem
         this.problemPanel = this.add.rectangle(
@@ -71,134 +72,220 @@ class GameScene extends Phaser.Scene {
         
         // Setup keyboard input for numbers
         this.input.keyboard.on('keydown', this.handleKeyInput, this);
+
+        this.debugTextureKeys();
     }
     
-    createEnvironment(levelData) {
-        const graphics = this.add.graphics();
-        
-        // Add different environments based on level theme
+    createEnvironment() {
         if (GameData.level === 1) { // Forest
-            // Draw some ground
-            graphics.fillStyle(0x8B5A2B);
-            graphics.fillRect(0, 400, 800, 200);
-            
-            // Draw grass
-            graphics.fillStyle(0x1E8449);
-            graphics.fillRect(0, 390, 800, 20);
-            
-            // Draw some trees in the background
-            for (let i = 0; i < 5; i++) {
-                const x = Phaser.Math.Between(50, 750);
-                const y = 390;
-                const scale = Phaser.Math.FloatBetween(0.5, 1.2);
-                this.drawTree(graphics, x, y, scale);
+            for (let i = 0; i < 3; i++) {
+                this.add.image(100 + (i * 250), 380, 'tree1').setScale(0.3);
             }
+            for (let i = 0; i < 2; i++) {
+                this.add.image(200 + (i * 300), 390, 'tree2').setScale(0.25);
+            }
+            this.add.image(700, 420, 'rock').setScale(0.2);
         } else if (GameData.level === 2) { // Canyon
-            // Draw sky gradient
-            for (let y = 0; y < 400; y++) {
-                const t = y / 400;
-                const r = Phaser.Math.Interpolation.Linear([135, 206], t);
-                const g = Phaser.Math.Interpolation.Linear([206, 235], t);
-                const b = Phaser.Math.Interpolation.Linear([250, 255], t);
-                const color = Phaser.Display.Color.GetColor(r, g, b);
-                
-                graphics.fillStyle(color, 1);
-                graphics.fillRect(0, y, 800, 1);
+            for (let i = 0; i < 4; i++) {
+                this.add.image(150 + (i * 200), 420, 'rock').setScale(0.2 + (i * 0.05));
             }
-            
-            // Draw canyon walls
-            graphics.fillStyle(0xC19A6B);
-            graphics.fillRect(0, 400, 800, 200);
-            
-            // Draw layered canyon rocks
-            for (let i = 0; i < 8; i++) {
-                const y = 400 + i * 20;
-                const shade = 0xC19A6B - i * 0x0F0908;
-                graphics.fillStyle(shade);
-                graphics.fillRect(0, y, 800, 20);
+            this.add.image(700, 380, 'signpost').setScale(0.3);
+        } else { // Mountain
+            this.add.image(200, 380, 'tree1').setScale(0.2);
+            for (let i = 0; i < 3; i++) {
+                this.add.image(300 + (i * 150), 420, 'rock').setScale(0.3 - (i * 0.05));
             }
-            
-            // Draw some rocks
-            for (let i = 0; i < 12; i++) {
-                const x = Phaser.Math.Between(50, 750);
-                const y = Phaser.Math.Between(420, 500);
-                const size = Phaser.Math.Between(5, 20);
-                graphics.fillStyle(0xA0A0A0);
-                graphics.fillCircle(x, y, size);
-            }
-        } else if (GameData.level === 3) { // Mountain
-            // Draw sky gradient (blue to lighter blue)
-            for (let y = 0; y < 400; y++) {
-                const t = y / 400;
-                const r = Phaser.Math.Interpolation.Linear([100, 135], t);
-                const g = Phaser.Math.Interpolation.Linear([149, 206], t);
-                const b = Phaser.Math.Interpolation.Linear([237, 250], t);
-                const color = Phaser.Display.Color.GetColor(r, g, b);
-                
-                graphics.fillStyle(color, 1);
-                graphics.fillRect(0, y, 800, 1);
-            }
-            
-            // Draw distant mountains
-            graphics.fillStyle(0x7F99BB);
-            graphics.beginPath();
-            graphics.moveTo(0, 350);
-            graphics.lineTo(100, 320);
-            graphics.lineTo(200, 350);
-            graphics.lineTo(300, 330);
-            graphics.lineTo(400, 360);
-            graphics.lineTo(500, 340);
-            graphics.lineTo(600, 370);
-            graphics.lineTo(700, 350);
-            graphics.lineTo(800, 380);
-            graphics.lineTo(800, 400);
-            graphics.lineTo(0, 400);
-            graphics.closePath();
-            graphics.fill();
-            
-            // Draw mid mountains with snow peaks
-            graphics.fillStyle(0x58749A);
-            graphics.beginPath();
-            graphics.moveTo(0, 400);
-            graphics.lineTo(150, 350);
-            graphics.lineTo(250, 390);
-            graphics.lineTo(400, 360);
-            graphics.lineTo(500, 400);
-            graphics.lineTo(650, 370);
-            graphics.lineTo(800, 400);
-            graphics.lineTo(800, 450);
-            graphics.lineTo(0, 450);
-            graphics.closePath();
-            graphics.fill();
-            
-            // Draw snow peaks
-            graphics.fillStyle(0xFFFFFF);
-            graphics.beginPath();
-            graphics.moveTo(130, 360);
-            graphics.lineTo(150, 350);
-            graphics.lineTo(170, 360);
-            graphics.closePath();
-            graphics.fill();
-            
-            graphics.beginPath();
-            graphics.moveTo(380, 370);
-            graphics.lineTo(400, 360);
-            graphics.lineTo(420, 370);
-            graphics.closePath();
-            graphics.fill();
-            
-            graphics.beginPath();
-            graphics.moveTo(630, 380);
-            graphics.lineTo(650, 370);
-            graphics.lineTo(670, 380);
-            graphics.closePath();
-            graphics.fill();
-            
-            // Draw foreground ground
-            graphics.fillStyle(0x4A5D7E);
-            graphics.fillRect(0, 450, 800, 150);
         }
     }
+    
+    createCharacter() {
+        // Create the character with animations
+        this.character = this.add.sprite(120, 435, 'idle_1')
+            .setScale(0.15); // Adjust scale to match your sprite size
+        
+        // Check if animations exist
+        console.log("Available animations:", this.anims.anims.entries);
+        
+        // Start with idle animation
+        if (this.anims.exists('idle')) {
+            this.character.anims.play('idle');
+        } else {
+            console.error("Idle animation not found!");
+            // Use a static frame as fallback
+            this.character.setTexture('idle_1');
+        }
+        
+        // Group all parts for movement
+        this.characterGroup = this.add.group([this.character]);
+        
+        // Add simple idle animation
+        this.idleAnimation = this.tweens.add({
+            targets: this.characterGroup.getChildren(),
+            y: '-=3',
+            duration: 500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+    }
+    
+    moveCharacter() {
+        // Stop idle animation and tween
+        if (this.idleAnimation) {
+            this.idleAnimation.stop();
+        }
+        
+        // Calculate position increment
+        const totalProblems = GameData.levelConfig[GameData.level - 1].problemsToSolve;
+        const increment = 580 / totalProblems;
+        this.characterPosition += increment;
+        
+        // Extremely simple approach - just show ONE run frame during movement
+        // This will at least verify if the texture exists and can be displayed
+        this.character.setTexture('idle_1'); // First use a known working texture
+        
+        // After a brief delay, try to set the run texture
+        this.time.delayedCall(100, () => {
+            console.log("About to set run_1 texture...");
+            try {
+                // Try setting the run texture with a bigger scale to make it more visible
+                this.character.setTexture('run_1').setScale(0.2);
+                console.log("Run texture set successfully");
+            } catch (e) {
+                console.error("Failed to set run texture:", e);
+            }
+        });
+        
+        // Move character
+        this.tweens.add({
+            targets: this.character,
+            x: this.character.x + increment,
+            duration: 1000,
+            ease: 'Power2',
+            onComplete: () => {
+                console.log("Movement complete");
+                // Return to idle
+                this.character.setTexture('idle_1').setScale(0.15);
+                
+                // Show celebration effect
+                this.showCelebrationEffect();
+                
+                // Restart idle animation
+                this.idleAnimation = this.tweens.add({
+                    targets: this.character,
+                    y: '-=3',
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+                
+                // Show pattern explanation
+                this.showPatternExplanation();
+            }
+        });
+    }
+    
+    // Also fix this animation reference in showIncorrectAnimation
+    showIncorrectAnimation() {
+        // Play hurt animation
+        this.character.anims.play('hurt');
+        
+        // Return to idle after animation completes
+        this.time.delayedCall(800, () => {
+            this.character.anims.play('idle');
+        });
+    }
+    
+    // Modify checkAnswer to use the hurt animation
+    // Modify checkAnswer to use the hurt animation
+checkAnswer() {
+    if (this.userAnswer === '') {
+        this.feedbackText.setText('Please enter an answer!');
+        this.feedbackText.setFill('#ff0000');
+        this.feedbackText.setVisible(true);
+        return;
+    }
+    
+    const userNum = parseInt(this.userAnswer);
+    
+    if (userNum === this.currentProblem.answer) {
+        // Correct answer
+        this.feedbackText.setText('Correct! 🎉');
+        this.feedbackText.setFill('#00aa00');
+        this.feedbackText.setVisible(true);
+        
+        // Update score
+        GameData.score += 10 + GameData.level * 5;
+        this.scoreText.setText(`Score: ${GameData.score}`);
+        
+        // Update stars
+        this.problemsSolved++;
+        GameData.stars = this.problemsSolved;
+        
+        // Update star visuals
+        const stars = this.starsGroup.getChildren();
+        if (stars[this.problemsSolved - 1]) {
+            stars[this.problemsSolved - 1].fillColor = 0xFFD700;
+            
+            // Add a little animation to the star
+            this.tweens.add({
+                targets: stars[this.problemsSolved - 1],
+                scale: { from: 1, to: 1.5 },
+                duration: 300,
+                yoyo: true,
+                onComplete: () => {
+                    stars[this.problemsSolved - 1].setScale(1);
+                }
+            });
+        }
+        
+        // Temporarily disable input
+        this.allowInput = false;
+        
+        // Move character forward
+        this.moveCharacter();
+        
+        // Check if level is complete
+        if (this.problemsSolved >= GameData.levelConfig[GameData.level - 1].problemsToSolve) {
+            // Stop timer
+            if (this.timer) {
+                this.timer.remove();
+            }
+            
+            // Wait a moment before transitioning
+            this.time.delayedCall(2000, () => {
+                // Check if this is the last level
+                if (GameData.level >= GameData.totalLevels) {
+                    this.scene.start('GameCompleteScene');
+                } else {
+                    this.scene.start('LevelCompleteScene');
+                }
+            });
+        } else {
+            // Continue to next problem after a delay
+            this.time.delayedCall(2000, () => {
+                this.allowInput = true;
+                this.generateProblem();
+            });
+        }
+    } else {
+        // Incorrect answer with animation
+        this.feedbackText.setText('Try again!');
+        this.feedbackText.setFill('#ff0000');
+        this.feedbackText.setVisible(true);
+        
+        // Show hurt animation
+        this.showIncorrectAnimation();
+        
+        // Show hint button after first attempt
+        this.hintButton.setVisible(true);
+        
+        // Clear answer
+        this.userAnswer = '';
+        this.updateAnswerDisplay();
+    }
+}
     
     drawTree(graphics, x, y, scale = 1) {
         // Draw tree trunk
@@ -214,73 +301,68 @@ class GameScene extends Phaser.Scene {
     }
     
     createPath() {
+        // Define path dimensions with margins from edges
+        const pathMargin = 10; // Margin from screen edges
+        const pathY = 450;     // Y position of the path
+        const pathHeight = 20; // Height of the path
+        
+        // Calculate path width based on screen width and margins
+        const pathWidth = this.cameras.main.width - (pathMargin * 2);
+        const pathX = pathMargin;
+        
         // Draw a path for the character to walk on
         const path = this.add.graphics();
         path.fillStyle(0xA0522D);
-        path.fillRect(100, 450, 600, 20);
+        path.fillRect(pathX, pathY, pathWidth, pathHeight);
         
         // Add some details to the path
         const details = this.add.graphics();
         details.fillStyle(0x8B4513);
         
-        for (let i = 0; i < 20; i++) {
-            const x = 120 + (i * 30);
-            details.fillRect(x, 450, 20, 3);
+        // Number of details based on path width
+        const numDetails = Math.floor(pathWidth / 30);
+        const detailSpacing = pathWidth / numDetails;
+        
+        for (let i = 0; i < numDetails; i++) {
+            const x = pathX + (i * detailSpacing) + 10; // Offset by 10 to position details
+            details.fillRect(x, pathY, 20, 3);
         }
-    }
-    
-    createCharacter() {
-        const characterGroup = [];
         
-        // Create character base
-        this.character = this.add.circle(120, 435, 15, 0xFF0000);
-        characterGroup.push(this.character);
+        // Update flag position
+        if (this.flag) {
+            this.flag.x = pathX + pathWidth - 10;
+        }
         
-        // Add eyes and smile to make it look like a character
-        const leftEye = this.add.circle(115, 430, 3, 0x000000);
-        const rightEye = this.add.circle(125, 430, 3, 0x000000);
-        characterGroup.push(leftEye, rightEye);
+        // Also update character starting position
+        if (this.character) {
+            this.character.x = pathX + 20;
+        }
         
-        // Create smile using arc
-        const smile = this.add.graphics();
-        smile.lineStyle(2, 0x000000, 1);
-        smile.beginPath();
-        smile.arc(120, 435, 8, 0.2, Math.PI - 0.2, false);
-        smile.strokePath();
-        
-        // Add arms and legs
-        const leftArm = this.add.rectangle(110, 440, 10, 3, 0xFF0000);
-        const rightArm = this.add.rectangle(130, 440, 10, 3, 0xFF0000);
-        const leftLeg = this.add.rectangle(115, 455, 3, 10, 0xFF0000);
-        const rightLeg = this.add.rectangle(125, 455, 3, 10, 0xFF0000);
-        
-        characterGroup.push(smile, leftArm, rightArm, leftLeg, rightLeg);
-        
-        // Group all parts together
-        this.characterGroup = this.add.group(characterGroup);
-        
-        // Add simple idle animation
-        this.idleAnimation = this.tweens.add({
-            targets: this.characterGroup.getChildren(),
-            y: '-=3',
-            duration: 500,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-        });
+        // Store path bounds for character movement calculations
+        this.pathBounds = {
+            x: pathX,
+            y: pathY,
+            width: pathWidth,
+            height: pathHeight,
+            right: pathX + pathWidth
+        };
     }
     
     createFinishFlag() {
+        // Path bounds may not be defined yet if this runs before createPath
+        const pathRight = this.pathBounds ? this.pathBounds.right -25 : this.cameras.main.width - 70;
+        const pathY = 450;
+        
         // Create finish flag at the end of the path
         const flag = this.add.graphics();
         
         // Draw pole
         flag.fillStyle(0x000000);
-        flag.fillRect(700, 420, 3, 30);
+        flag.fillRect(pathRight, pathY - 30, 3, 30);
         
         // Draw flag
         flag.fillStyle(0xFF0000);
-        flag.fillTriangle(703, 420, 703, 435, 718, 427.5);
+        flag.fillTriangle(pathRight + 3, pathY - 30, pathRight + 3, pathY - 15, pathRight + 18, pathY - 22.5);
         
         // Add simple animation to the flag
         this.tweens.add({
@@ -291,6 +373,9 @@ class GameScene extends Phaser.Scene {
             repeat: -1,
             ease: 'Sine.easeInOut'
         });
+        
+        // Store reference to the flag
+        this.flag = flag;
     }
     
     createUI() {
@@ -697,92 +782,7 @@ class GameScene extends Phaser.Scene {
         this.hintText.setVisible(false);
         this.feedbackText.setVisible(false);
     }
-    
-    checkAnswer() {
-        if (this.userAnswer === '') {
-            this.feedbackText.setText('Please enter an answer!');
-            this.feedbackText.setFill('#ff0000');
-            this.feedbackText.setVisible(true);
-            return;
-        }
-        
-        const userNum = parseInt(this.userAnswer);
-        
-        if (userNum === this.currentProblem.answer) {
-            // Correct answer
-            this.feedbackText.setText('Correct! 🎉');
-            this.feedbackText.setFill('#00aa00');
-            this.feedbackText.setVisible(true);
-            
-            // Update score
-            GameData.score += 10 + GameData.level * 5;
-            this.scoreText.setText(`Score: ${GameData.score}`);
-            
-            // Update stars
-            this.problemsSolved++;
-            GameData.stars = this.problemsSolved;
-            
-            // Update star visuals
-            const stars = this.starsGroup.getChildren();
-            if (stars[this.problemsSolved - 1]) {
-                // Change color instead of using setTint
-                stars[this.problemsSolved - 1].fillColor = 0xFFD700;
-                
-                // Add a little animation to the star
-                this.tweens.add({
-                    targets: stars[this.problemsSolved - 1],
-                    scale: { from: 1, to: 1.5 },
-                    duration: 300,
-                    yoyo: true,
-                    onComplete: () => {
-                        stars[this.problemsSolved - 1].setScale(1);
-                    }
-                });
-            }
-            
-            // Temporarily disable input
-            this.allowInput = false;
-            
-            // Move character forward
-            this.moveCharacter();
-            
-            // Check if level is complete
-            if (this.problemsSolved >= GameData.levelConfig[GameData.level - 1].problemsToSolve) {
-                // Stop timer
-                if (this.timer) {
-                    this.timer.remove();
-                }
-                
-                // Wait a moment before transitioning
-                this.time.delayedCall(2000, () => {
-                    // Check if this is the last level
-                    if (GameData.level >= GameData.totalLevels) {
-                        this.scene.start('GameCompleteScene');
-                    } else {
-                        this.scene.start('LevelCompleteScene');
-                    }
-                });
-            } else {
-                // Continue to next problem after a delay
-                this.time.delayedCall(2000, () => {
-                    this.allowInput = true;
-                    this.generateProblem();
-                });
-            }
-        } else {
-            // Incorrect answer
-            this.feedbackText.setText('Try again!');
-            this.feedbackText.setFill('#ff0000');
-            this.feedbackText.setVisible(true);
-            
-            // Show hint button after first attempt
-            this.hintButton.setVisible(true);
-            
-            // Clear answer
-            this.userAnswer = '';
-            this.updateAnswerDisplay();
-        }
-    }
+
     
     showHint() {
         this.showingHint = !this.showingHint;
@@ -963,5 +963,19 @@ class GameScene extends Phaser.Scene {
                 }
             });
         }
+    }
+    debugTextureKeys() {
+        console.log("All textures loaded:", Object.keys(this.textures.list));
+        
+        // Check specific run textures
+        for (let i = 1; i <= 8; i++) {
+            const key = `run_${i}`;
+            console.log(`Texture ${key} exists:`, this.textures.exists(key));
+        }
+        
+        // Try to find any textures that contain "Run" in their name
+        const runKeys = Object.keys(this.textures.list).filter(key => 
+            key.includes("Run") || key.includes("run"));
+        console.log("Found run-related textures:", runKeys);
     }
 }

@@ -8,17 +8,29 @@ class LevelIntroScene extends Phaser.Scene {
     create() {
         const levelData = GameData.levelConfig[GameData.level - 1];
         
-        // Create background
-        this.add.rectangle(
-            this.cameras.main.width / 2,
-            this.cameras.main.height / 2,
-            this.cameras.main.width,
-            this.cameras.main.height,
-            levelData.backgroundColor
-        );
+        // Set background based on level
+        let backgroundKey;
+        if (GameData.level === 1) backgroundKey = 'forest_bg';
+        else if (GameData.level === 2) backgroundKey = 'canyon_bg';
+        else backgroundKey = 'mountain_bg';
         
-        // Add decorative elements based on level
-        this.createLevelDecorations(levelData);
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, backgroundKey)
+            .setOrigin(0.5)
+            .setScale(this.cameras.main.width / 800, this.cameras.main.height / 600); // Adjust scale to fit screen
+        
+        // Add appropriate environmental objects based on level
+        if (GameData.level === 1) { // Forest
+            this.add.image(200, 500, 'tree1').setScale(0.3);
+            this.add.image(300, 480, 'tree2').setScale(0.25);
+            this.add.image(150, 530, 'rock').setScale(0.2);
+        } else if (GameData.level === 2) { // Canyon
+            this.add.image(200, 530, 'rock').setScale(0.3);
+            this.add.image(700, 530, 'rock').setScale(0.25);
+            this.add.image(400, 500, 'signpost').setScale(0.3);
+        } else { // Mountain
+            this.add.image(200, 500, 'tree1').setScale(0.2);
+            this.add.image(700, 530, 'rock').setScale(0.3);
+        }
         
         // Level title
         this.add.text(

@@ -1,5 +1,3 @@
-// Preload Scene - Handles asset loading and generation
-
 class PreloadScene extends Phaser.Scene {
     constructor() {
         super({ key: 'PreloadScene' });
@@ -37,13 +35,53 @@ class PreloadScene extends Phaser.Scene {
             loadingText.destroy();
         });
         
-        // Instead of trying to load dummy assets, just simulate a delay
-        // This avoids CORS errors with about:blank
+        // Load background images
+        this.load.image('forest_bg', 'assets/backgrounds/forest.jpg');
+        this.load.image('canyon_bg', 'assets/backgrounds/canyon.jpg');
+        this.load.image('mountain_bg', 'assets/backgrounds/mountain.jpg');
+        
+        // Load character sprite animations
+        // Load Idle animation frames
+        for (let i = 1; i <= 10; i++) {
+            this.load.image(`idle_${i}`, `assets/characters/Idle (${i}).png`);
+        }
+        
+        // Load Run animation frames
+        // In PreloadScene's preload() method:
+        for (let i = 1; i <= 8; i++) {
+            this.load.image(`run_${i}`, `assets/characters/Run (${i}).png`);
+        }
+        
+        // Load Jump animation frames
+        for (let i = 1; i <= 12; i++) {
+            this.load.image(`jump_${i}`, `assets/characters/Jump (${i}).png`);
+        }
+        
+        // Load Dead animation frames (for incorrect answers)
+        for (let i = 1; i <= 10; i++) {
+            this.load.image(`dead_${i}`, `assets/characters/Dead (${i}).png`);
+        }
+        
+        // Load Hurt animation frames (for incorrect answers)
+        for (let i = 1; i <= 8; i++) {
+            this.load.image(`hurt_${i}`, `assets/characters/Hurt (${i}).png`);
+        }
+        
+        // Load Slide animation frames (can be used for special moves)
+        for (let i = 1; i <= 5; i++) {
+            this.load.image(`slide_${i}`, `assets/characters/Slide (${i}).png`);
+        }
+        
+        // Load environment objects
+        this.load.image('tree1', 'assets/objects/tree1.png');
+        this.load.image('tree2', 'assets/objects/tree2.png');
+        this.load.image('rock', 'assets/objects/rock.png');
+        this.load.image('signpost', 'assets/objects/signpost.png');
     }
 
     create() {
-        // Create animal animation data
-        this.createAnimationData();
+        // Create animations
+        this.createAnimations();
         
         // Simulate loading completion with a small delay
         this.time.delayedCall(500, () => {
@@ -52,68 +90,67 @@ class PreloadScene extends Phaser.Scene {
         });
     }
     
-    createAnimationData() {
-        // Define animal graphics data for later generation
-        // This allows us to procedurally generate animal sprites
+    createAnimations() {
+        // Create character animations from the loaded frames
         
-        // Fox data (simple polygon shape data)
-        this.game.foxData = {
-            body: [
-                {x: 0, y: 10}, {x: 20, y: 0}, {x: 40, y: 10},
-                {x: 40, y: 30}, {x: 20, y: 40}, {x: 0, y: 30}
-            ],
-            ears: [
-                [{x: 10, y: 5}, {x: 15, y: -5}, {x: 20, y: 5}],
-                [{x: 20, y: 5}, {x: 25, y: -5}, {x: 30, y: 5}]
-            ],
-            tail: [
-                {x: 0, y: 20}, {x: -15, y: 15}, {x: -20, y: 5}, {x: -15, y: 0}
-            ],
-            face: {
-                eyes: [{x: 15, y: 15}, {x: 25, y: 15}],
-                nose: {x: 20, y: 20},
-                mouth: [{x: 15, y: 25}, {x: 20, y: 28}, {x: 25, y: 25}]
-            }
-        };
+        // Idle animation
+        const idleFrames = [];
+        for (let i = 1; i <= 10; i++) {
+            idleFrames.push({ key: `idle_${i}` });
+        }
         
-        // Eagle data
-        this.game.eagleData = {
-            body: [
-                {x: 10, y: 20}, {x: 30, y: 20}, {x: 40, y: 30},
-                {x: 30, y: 40}, {x: 10, y: 40}, {x: 0, y: 30}
-            ],
-            wings: [
-                [{x: 0, y: 25}, {x: -15, y: 15}, {x: -5, y: 35}],
-                [{x: 40, y: 25}, {x: 55, y: 15}, {x: 45, y: 35}]
-            ],
-            head: [
-                {x: 15, y: 15}, {x: 25, y: 15}, {x: 25, y: 10}, 
-                {x: 30, y: 15}, {x: 20, y: 20}, {x: 15, y: 15}
-            ],
-            face: {
-                eyes: [{x: 17, y: 15}, {x: 23, y: 15}],
-                beak: [{x: 20, y: 17}, {x: 25, y: 20}, {x: 20, y: 23}]
-            }
-        };
+        this.anims.create({
+            key: 'idle',
+            frames: idleFrames,
+            frameRate: 10,
+            repeat: -1
+        });
         
-        // Owl data
-        this.game.owlData = {
-            body: [
-                {x: 10, y: 20}, {x: 30, y: 20}, {x: 35, y: 35},
-                {x: 20, y: 45}, {x: 5, y: 35}
-            ],
-            head: [
-                {x: 10, y: 15}, {x: 30, y: 15}, {x: 35, y: 5},
-                {x: 20, y: 0}, {x: 5, y: 5}
-            ],
-            ears: [
-                [{x: 12, y: 5}, {x: 8, y: -5}, {x: 5, y: 5}],
-                [{x: 28, y: 5}, {x: 32, y: -5}, {x: 35, y: 5}]
-            ],
-            face: {
-                eyes: [{x: 15, y: 10}, {x: 25, y: 10}],
-                beak: [{x: 18, y: 15}, {x: 20, y: 18}, {x: 22, y: 15}]
-            }
-        };
+        // Run animation
+        const runFrameNames = [];
+        for (let i = 1; i <= 8; i++) {
+            runFrameNames.push({ key: `run_${i}` });
+        }
+        console.log("Run animation frames:", runFrameNames);
+        this.anims.create({
+            key: 'run',
+            frames: runFrameNames,
+            frameRate: 12,
+            repeat: -1
+        });
+        
+        // Jump animation
+        const jumpFrames = [];
+        for (let i = 1; i <= 12; i++) {
+            jumpFrames.push({ key: `jump_${i}` });
+        }
+        
+        this.anims.create({
+            key: 'jump',
+            frames: jumpFrames,
+            frameRate: 15,
+            repeat: 0
+        });
+        
+        // Celebrate animation (using jump frames for now)
+        this.anims.create({
+            key: 'celebrate',
+            frames: jumpFrames.slice(0, 6), // Use first half of jump frames
+            frameRate: 8,
+            repeat: 1
+        });
+        
+        // Hurt animation
+        const hurtFrames = [];
+        for (let i = 1; i <= 8; i++) {
+            hurtFrames.push({ key: `hurt_${i}` });
+        }
+        
+        this.anims.create({
+            key: 'hurt',
+            frames: hurtFrames,
+            frameRate: 10,
+            repeat: 0
+        });
     }
 }

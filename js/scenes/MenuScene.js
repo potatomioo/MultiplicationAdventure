@@ -6,11 +6,19 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        // Create gradient background
-        this.createGradientBackground(0x6495ED, 0x4169E1);
+        // Use a background image instead of gradient
+        this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'forest_bg')
+            .setOrigin(0.5)
+            .setScale(this.cameras.main.width / 800, this.cameras.main.height / 600) // Adjust scale to fit screen
+            .setAlpha(0.8); // Slightly transparent so UI is readable
         
-        // Draw decorative elements
+        // Draw decorative math symbols in the background
         this.drawDecorations();
+        
+        // Add decorative objects
+        this.add.image(100, 500, 'tree1').setScale(0.3);
+        this.add.image(700, 500, 'tree2').setScale(0.3);
+        this.add.image(400, 530, 'rock').setScale(0.2);
         
         // Title text
         this.add.text(
@@ -28,7 +36,7 @@ class MenuScene extends Phaser.Scene {
         // Create start button
         const startButton = this.add.rectangle(
             this.cameras.main.width / 2,
-            250,
+            250, // Moved higher as requested
             200,
             60,
             0x4CAF50
@@ -37,7 +45,7 @@ class MenuScene extends Phaser.Scene {
         // Add button text
         const startText = this.add.text(
             this.cameras.main.width / 2, 
-            250, 
+            250, // Match button position
             'Start Adventure', 
             { 
                 font: '24px Arial',
