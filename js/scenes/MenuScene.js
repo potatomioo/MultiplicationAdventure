@@ -12,6 +12,9 @@ class MenuScene extends Phaser.Scene {
             .setScale(this.cameras.main.width / 3000, this.cameras.main.height / 3000)
             .setAlpha(1);
         
+        // Add character to bottom left
+        this.createCharacter();
+        
         // Add Start.png UI component
         const startUI = this.add.image(
             this.cameras.main.width / 2,
@@ -24,26 +27,34 @@ class MenuScene extends Phaser.Scene {
             this.cameras.main.width / 2,
             this.cameras.main.height / 2 + 120,
             'Nextbutton'
-        ).setScale(0.4).setInteractive();
+        ).setScale(0.5).setInteractive();
         
         // Add button functionality
         nextButton.on('pointerover', () => {
-            nextButton.setScale(0.5);
+            nextButton.setScale(0.55);
         });
         
         nextButton.on('pointerout', () => {
-            nextButton.setScale(0.4);
+            nextButton.setScale(0.5);
         });
         
         nextButton.on('pointerdown', () => {
+            // Play click sound
+            this.sound.play('click');
+            
             // Reset game data
             GameData.reset();
+            
+            // Clean up interval if exists
+            if (this.idleInterval) {
+                clearInterval(this.idleInterval);
+            }
             
             // Start first level intro
             this.scene.start('LevelIntroScene');
         });
-        this.createCharacter();
     }
+
     createCharacter() {
         // Create character in bottom left
         this.character = this.add.sprite(-50, 550, 'slide_1')

@@ -471,33 +471,26 @@ class GameScene extends Phaser.Scene {
             }
         ).setOrigin(0.5);
         
-        // Check button
-        this.checkButton = this.add.rectangle(
+        // Check button - use UI image instead of rectangle
+        this.checkButton = this.add.image(
             this.cameras.main.width / 2,
-            230,
-            150,
-            40,
-            0x4CAF50
-        ).setInteractive();
-        
-        this.checkButtonText = this.add.text(
-            this.cameras.main.width / 2, 
-            230, 
-            'Check', 
-            { 
-                font: '20px Arial',
-                fill: '#ffffff' 
-            }
-        ).setOrigin(0.5);
+            250,
+            'CheckButton'
+        ).setScale(0.25).setInteractive();
         
         // Make button interactive
         this.checkButton.on('pointerover', () => {
-            this.checkButton.fillColor = 0x3E8E41;
+            this.checkButton.setScale(0.3);
         });
+        
         this.checkButton.on('pointerout', () => {
-            this.checkButton.fillColor = 0x4CAF50;
+            this.checkButton.setScale(0.25);
         });
+        
         this.checkButton.on('pointerdown', () => {
+            // Play click sound
+            this.sound.play('click');
+            
             if (this.allowInput) {
                 this.checkAnswer();
             }
@@ -530,6 +523,9 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(0.5).setVisible(false).setInteractive();
         
         this.hintButton.on('pointerdown', () => {
+            // Play click sound
+            this.sound.play('click');
+            
             this.showHint();
         });
         
@@ -843,14 +839,14 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.width,
             this.cameras.main.height,
             0x000000,
-            0.7
+            0.8
         );
         
         // Create popup panel
         const popup = this.add.rectangle(
             this.cameras.main.width / 2,
             this.cameras.main.height / 2,
-            400,
+            500,
             250,
             0xFFFFFF,
             0.9
@@ -862,33 +858,32 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.height / 2 - 50,
             message,
             {
-                font: 'bold 32px Arial',
-                fill: '#FF0000',
+                font: 'bold 32px noto-sans',
+                fill: '#00000',
                 align: 'center'
             }
         ).setOrigin(0.5);
         
-        // Add restart button
-        const restartButton = this.add.rectangle(
+        // Add restart button - use UI image
+        const restartButton = this.add.image(
             this.cameras.main.width / 2,
             this.cameras.main.height / 2 + 50,
-            200,
-            60,
-            0x4CAF50
-        ).setInteractive();
-        
-        this.add.text(
-            this.cameras.main.width / 2,
-            this.cameras.main.height / 2 + 50,
-            'Restart Level',
-            {
-                font: '24px Arial',
-                fill: '#FFFFFF'
-            }
-        ).setOrigin(0.5);
+            'Restart'
+        ).setScale(0.3).setInteractive();
         
         // Add button functionality
+        restartButton.on('pointerover', () => {
+            restartButton.setScale(0.4);
+        });
+        
+        restartButton.on('pointerout', () => {
+            restartButton.setScale(0.3);
+        });
+        
         restartButton.on('pointerdown', () => {
+            // Play click sound
+            this.sound.play('click');
+            
             // Reset level (keep current level but start fresh)
             this.scene.start('LevelIntroScene');
         });

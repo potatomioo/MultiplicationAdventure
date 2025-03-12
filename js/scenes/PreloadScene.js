@@ -82,11 +82,16 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('Start', 'assets/ui/Start.png');
         this.load.image('Nextbutton', 'assets/ui/Nextbutton.png');
         this.load.image('Startbutton', 'assets/ui/Startbutton.png');
+        this.load.image('CheckButton', 'assets/ui/CheckButton.png');
+        this.load.image('Restart', 'assets/ui/Restart.png');
         this.load.image('Fof', 'assets/ui/Fof.png');
         this.load.image('EC', 'assets/ui/EC.png');
         this.load.image('MM', 'assets/ui/MM.png');
         this.load.image('LC', 'assets/ui/LC.png');
         this.load.image('AC', 'assets/ui/AC.png');
+
+        // Load audio
+        this.load.audio('click', 'assets/audios/click.mp3');
     }
 
     create() {

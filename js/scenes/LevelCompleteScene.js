@@ -58,6 +58,9 @@ class LevelCompleteScene extends Phaser.Scene {
         });
         
         nextButton.on('pointerdown', () => {
+            // Play click sound
+            this.sound.play('click');
+            
             GameData.level++;
             this.scene.start('LevelIntroScene');
         });

@@ -19,7 +19,7 @@ class GameCompleteScene extends Phaser.Scene {
         // Add final score with animation
         const finalScore = this.add.text(
             this.cameras.main.width / 2, 
-            this.cameras.main.height / 2 + 80, 
+            this.cameras.main.height / 2 + 100, 
             `Final Score: ${GameData.score}`, 
             { 
                 font: 'bold 48px Arial',

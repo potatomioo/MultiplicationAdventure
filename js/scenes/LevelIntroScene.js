@@ -33,18 +33,26 @@ class LevelIntroScene extends Phaser.Scene {
             this.cameras.main.width / 2,
             this.cameras.main.height / 2 + 120,
             'Startbutton'
-        ).setScale(0.4).setInteractive();
+        ).setScale(0.5).setInteractive();
         
         // Add button functionality
         startButton.on('pointerover', () => {
-            startButton.setScale(0.5);
+            startButton.setScale(0.55);
         });
         
         startButton.on('pointerout', () => {
-            startButton.setScale(0.4);
+            startButton.setScale(0.5);
         });
         
         startButton.on('pointerdown', () => {
+            // Play click sound
+            this.sound.play('click');
+            
+            // Clean up interval if exists
+            if (this.idleInterval) {
+                clearInterval(this.idleInterval);
+            }
+            
             this.scene.start('GameScene');
         });
 
