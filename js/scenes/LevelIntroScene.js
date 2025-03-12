@@ -16,93 +16,34 @@ class LevelIntroScene extends Phaser.Scene {
         
         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, backgroundKey)
             .setOrigin(0.5)
-            .setScale(this.cameras.main.width / 800, this.cameras.main.height / 600); // Adjust scale to fit screen
+            .setScale(this.cameras.main.width / 3000, this.cameras.main.height / 3000);
         
-        // Add appropriate environmental objects based on level
-        if (GameData.level === 1) { // Forest
-            this.add.image(200, 500, 'tree1').setScale(0.3);
-            this.add.image(300, 480, 'tree2').setScale(0.25);
-            this.add.image(150, 530, 'rock').setScale(0.2);
-        } else if (GameData.level === 2) { // Canyon
-            this.add.image(200, 530, 'rock').setScale(0.3);
-            this.add.image(700, 530, 'rock').setScale(0.25);
-            this.add.image(400, 500, 'signpost').setScale(0.3);
-        } else { // Mountain
-            this.add.image(200, 500, 'tree1').setScale(0.2);
-            this.add.image(700, 530, 'rock').setScale(0.3);
+        // Add appropriate level UI based on level
+        let levelUI;
+        if (GameData.level === 1) {
+            levelUI = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2 - 80, 'Fof').setScale(1);
+        } else if (GameData.level === 2) {
+            levelUI = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2 - 80, 'EC').setScale(1);
+        } else {
+            levelUI = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2 - 80, 'MM').setScale(1);
         }
         
-        // Level title
-        this.add.text(
-            this.cameras.main.width / 2, 
-            80, 
-            levelData.name, 
-            { 
-                font: '48px Arial',
-                fill: '#ffffff',
-                stroke: '#000000',
-                strokeThickness: 6
-            }
-        ).setOrigin(0.5);
-        
-        // Add level description
-        this.add.text(
-            this.cameras.main.width / 2, 
-            160, 
-            levelData.description, 
-            { 
-                font: '24px Arial',
-                fill: '#ffffff',
-                stroke: '#000000',
-                strokeThickness: 4,
-                align: 'center',
-                wordWrap: { width: 600 }
-            }
-        ).setOrigin(0.5);
-        
-        // Add level focus
-        this.add.text(
-            this.cameras.main.width / 2, 
-            250, 
-            `Focus: ${levelData.focus}`, 
-            { 
-                font: '28px Arial',
-                fill: '#ffff00',
-                stroke: '#000000',
-                strokeThickness: 4
-            }
-        ).setOrigin(0.5);
-        
-        // Create animal guide based on level
-        this.createAnimalGuide(levelData);
-        
-        // Add start button
-        const startButton = this.add.rectangle(
+        // Add StartButton
+        const startButton = this.add.image(
             this.cameras.main.width / 2,
-            500,
-            200,
-            60,
-            0x4CAF50
-        ).setInteractive();
+            this.cameras.main.height / 2 + 120,
+            'Startbutton'
+        ).setScale(0.4).setInteractive();
         
-        // Add button text
-        const startText = this.add.text(
-            this.cameras.main.width / 2, 
-            500, 
-            'Start Level', 
-            { 
-                font: '24px Arial',
-                fill: '#ffffff' 
-            }
-        ).setOrigin(0.5);
-        
-        // Make button interactive
+        // Add button functionality
         startButton.on('pointerover', () => {
-            startButton.fillColor = 0x3E8E41;
+            startButton.setScale(0.5);
         });
+        
         startButton.on('pointerout', () => {
-            startButton.fillColor = 0x4CAF50;
+            startButton.setScale(0.4);
         });
+        
         startButton.on('pointerdown', () => {
             this.scene.start('GameScene');
         });

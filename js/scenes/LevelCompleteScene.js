@@ -9,7 +9,7 @@ class LevelCompleteScene extends Phaser.Scene {
         const completedLevelData = GameData.levelConfig[GameData.level - 1];
         const nextLevelData = GameData.levelConfig[GameData.level];
         
-        // Add background image with gradient overlay
+        // Add background with gradient overlay
         let backgroundKey;
         if (GameData.level === 1) backgroundKey = 'forest_bg';
         else if (GameData.level === 2) backgroundKey = 'canyon_bg';
@@ -17,111 +17,49 @@ class LevelCompleteScene extends Phaser.Scene {
         
         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, backgroundKey)
             .setOrigin(0.5)
-            .setScale(this.cameras.main.width / 800, this.cameras.main.height / 600)
-            .setAlpha(0.6); // More transparent for better visibility of UI
+            .setScale(this.cameras.main.width / 3000, this.cameras.main.height / 3000)
+            .setAlpha(0.6);
         
-        // Add animated background elements
-        this.createBackgroundElements();
-        
-        // Add a more visually appealing celebration panel with rounded corners and better styling
-        const panel = this.add.rectangle(
+        // Add the Level Complete UI
+        const lcUI = this.add.image(
             this.cameras.main.width / 2,
-            this.cameras.main.height / 2,
-            550,
-            450,
-            0xFFFFFF,
-            0.9
-        ).setStrokeStyle(8, 0x4a90e2);
+            this.cameras.main.height / 2 - 50,
+            'LC'
+        ).setScale(1);
         
-        // Add a trophy or achievement icon above the text
-        this.add.circle(
-            this.cameras.main.width / 2,
-            120,
-            40,
-            0xFFD700 // Gold color
-        );
-        
-        // Draw a simple trophy shape
-        const trophy = this.add.graphics();
-        trophy.fillStyle(0xFFD700);
-        trophy.fillRect(this.cameras.main.width / 2 - 15, 90, 30, 40);
-        trophy.fillStyle(0xFFD700);
-        trophy.fillCircle(this.cameras.main.width / 2, 90, 20);
-        trophy.fillStyle(0xFFD700);
-        trophy.fillRect(this.cameras.main.width / 2 - 25, 130, 50, 10);
-        
-        // Add level complete text with better styling
+        // Add the score text
         this.add.text(
             this.cameras.main.width / 2, 
-            180, 
-            'Level Complete!', 
+            this.cameras.main.height / 2, 
+            `Score: ${GameData.score}`, 
             { 
-                font: 'bold 48px Arial',
-                fill: '#4a90e2',
-                stroke: '#ffffff',
-                strokeThickness: 6,
-                shadow: { color: '#000000', blur: 10, stroke: true, fill: true }
+                font: 'bold 40px Arial',
+                fill: '#FFD700',
+                stroke: '#000000',
+                strokeThickness: 1,
+                shadow: { color: '#000000', blur: 10, fill: true }
             }
         ).setOrigin(0.5);
         
-        // Create more visually appealing stars
-        this.createEnhancedStarsDisplay();
-        
-        // Show score with animation
-        this.animateScoreCounter();
-        
-        // Show what you've learned section with better styling
-        this.createEnhancedLearnedSection(completedLevelData);
-        
-        // Show next level preview with better styling
-        this.createEnhancedNextLevelPreview(nextLevelData);
-        
-        // Add continue button with better design
-        const continueButton = this.add.rectangle(
+        // Add Next button
+        const nextButton = this.add.image(
             this.cameras.main.width / 2,
-            550, // Changed from 500 to 550
-            200,
-            60,
-            0x4CAF50
-        ).setInteractive();
+            this.cameras.main.height / 2 + 150,
+            'Nextbutton'
+        ).setScale(0.5).setInteractive();
         
-        // Add a glow effect to the button
-        const buttonGlow = this.add.graphics();
-        buttonGlow.fillStyle(0x4CAF50, 0.3);
-        buttonGlow.fillCircle(this.cameras.main.width / 2, 550, 40); // Changed from 500 to 550
-        
-        this.add.text(
-            this.cameras.main.width / 2, 
-            550, // Changed from 500 to 550
-            'Continue', 
-            { 
-                font: 'bold 24px Arial',
-                fill: '#ffffff',
-                shadow: { color: '#000000', blur: 2, offsetY: 2 }
-            }
-        ).setOrigin(0.5);
-        
-        // Make button interactive with more feedback
-        continueButton.on('pointerover', () => {
-            continueButton.fillColor = 0x3E8E41;
-            continueButton.setScale(1.1);
+        // Add button functionality
+        nextButton.on('pointerover', () => {
+            nextButton.setScale(0.55);
         });
-        continueButton.on('pointerout', () => {
-            continueButton.fillColor = 0x4CAF50;
-            continueButton.setScale(1.0);
+        
+        nextButton.on('pointerout', () => {
+            nextButton.setScale(0.5);
         });
-        continueButton.on('pointerdown', () => {
-            // Add click effect
-            this.tweens.add({
-                targets: continueButton,
-                scale: 0.9,
-                duration: 100,
-                yoyo: true,
-                onComplete: () => {
-                    GameData.level++;
-                    this.scene.start('LevelIntroScene');
-                }
-            });
+        
+        nextButton.on('pointerdown', () => {
+            GameData.level++;
+            this.scene.start('LevelIntroScene');
         });
     }
     

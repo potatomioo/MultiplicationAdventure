@@ -6,86 +6,42 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        // Use a background image instead of gradient
+        // Keep the background image
         this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'forest_bg')
             .setOrigin(0.5)
-            .setScale(this.cameras.main.width / 800, this.cameras.main.height / 600) // Adjust scale to fit screen
-            .setAlpha(0.8); // Slightly transparent so UI is readable
+            .setScale(this.cameras.main.width / 3000, this.cameras.main.height / 3000)
+            .setAlpha(1);
         
-        // Draw decorative math symbols in the background
-        this.drawDecorations();
-        
-        // Add decorative objects
-        this.add.image(100, 500, 'tree1').setScale(0.3);
-        this.add.image(700, 500, 'tree2').setScale(0.3);
-        this.add.image(400, 530, 'rock').setScale(0.2);
-        
-        // Title text
-        this.add.text(
-            this.cameras.main.width / 2, 
-            100, 
-            'Multiplication Adventure', 
-            { 
-                font: '48px Arial',
-                fill: '#ffffff',
-                stroke: '#000000',
-                strokeThickness: 6
-            }
-        ).setOrigin(0.5);
-        
-        // Create start button
-        const startButton = this.add.rectangle(
+        // Add Start.png UI component
+        const startUI = this.add.image(
             this.cameras.main.width / 2,
-            250, // Moved higher as requested
-            200,
-            60,
-            0x4CAF50
-        ).setInteractive();
+            this.cameras.main.height / 2 - 80,
+            'Start'
+        ).setScale(1);
         
-        // Add button text
-        const startText = this.add.text(
-            this.cameras.main.width / 2, 
-            250, // Match button position
-            'Start Adventure', 
-            { 
-                font: '24px Arial',
-                fill: '#ffffff' 
-            }
-        ).setOrigin(0.5);
+        // Add NextButton.png as interactive button below
+        const nextButton = this.add.image(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2 + 120,
+            'Nextbutton'
+        ).setScale(0.4).setInteractive();
         
-        // Make button interactive
-        startButton.on('pointerover', () => {
-            startButton.fillColor = 0x3E8E41;
+        // Add button functionality
+        nextButton.on('pointerover', () => {
+            nextButton.setScale(0.5);
         });
-        startButton.on('pointerout', () => {
-            startButton.fillColor = 0x4CAF50;
+        
+        nextButton.on('pointerout', () => {
+            nextButton.setScale(0.4);
         });
-        startButton.on('pointerdown', () => {
+        
+        nextButton.on('pointerdown', () => {
             // Reset game data
             GameData.reset();
             
             // Start first level intro
             this.scene.start('LevelIntroScene');
         });
-        
-        // Add instructions
-        this.add.text(
-            this.cameras.main.width / 2, 
-            450, 
-            'Learn multiplication while exploring magical lands!', 
-            { 
-                font: '20px Arial',
-                fill: '#ffffff',
-                stroke: '#000000',
-                strokeThickness: 4
-            }
-        ).setOrigin(0.5);
-        
-        // Add level preview cards
-        this.createLevelPreviews();
-        
-        // Add animated character
-        this.createCharacter();
     }
     
     createGradientBackground(color1, color2) {

@@ -77,6 +77,16 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('tree2', 'assets/objects/tree2.png');
         this.load.image('rock', 'assets/objects/rock.png');
         this.load.image('signpost', 'assets/objects/signpost.png');
+
+        // Load UI assets
+        this.load.image('Start', 'assets/ui/Start.png');
+        this.load.image('Nextbutton', 'assets/ui/Nextbutton.png');
+        this.load.image('Startbutton', 'assets/ui/Startbutton.png');
+        this.load.image('Fof', 'assets/ui/Fof.png');
+        this.load.image('EC', 'assets/ui/EC.png');
+        this.load.image('MM', 'assets/ui/MM.png');
+        this.load.image('LC', 'assets/ui/LC.png');
+        this.load.image('AC', 'assets/ui/AC.png');
     }
 
     create() {

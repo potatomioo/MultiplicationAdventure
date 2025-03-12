@@ -6,86 +6,36 @@ class GameCompleteScene extends Phaser.Scene {
     }
 
     create() {
-        // Create gradient background
+        // Create a nice gradient background
         this.createGradientBackground(0x4a90e2, 0x8e44ad);
         
-        // Add celebration effects
-        this.createCelebrationEffects();
+        // Add the Game Complete UI
+        const acUI = this.add.image(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2 - 50,
+            'AC'
+        ).setScale(0.8);
         
-        // Add game complete text
-        this.add.text(
+        // Add final score with animation
+        const finalScore = this.add.text(
             this.cameras.main.width / 2, 
-            100, 
-            'Adventure Complete!', 
-            { 
-                font: '48px Arial',
-                fill: '#ffffff',
-                stroke: '#000000',
-                strokeThickness: 6
-            }
-        ).setOrigin(0.5);
-        
-        // Add congratulations message
-        this.add.text(
-            this.cameras.main.width / 2, 
-            170, 
-            'You\'ve mastered multiplication!', 
-            { 
-                font: '28px Arial',
-                fill: '#ffffff',
-                stroke: '#000000',
-                strokeThickness: 3
-            }
-        ).setOrigin(0.5);
-        
-        // Add final score
-        this.add.text(
-            this.cameras.main.width / 2, 
-            230, 
+            this.cameras.main.height / 2 + 80, 
             `Final Score: ${GameData.score}`, 
             { 
-                font: '36px Arial',
+                font: 'bold 48px Arial',
                 fill: '#FFD700',
                 stroke: '#000000',
-                strokeThickness: 3
+                strokeThickness: 6,
+                shadow: { color: '#000000', blur: 10, fill: true }
             }
-        ).setOrigin(0.5);
+        ).setOrigin(0.5).setScale(0);
         
-        // Add certificate
-        this.createCertificate();
-        
-        // Add skills learned section
-        this.createSkillsLearnedSection();
-        
-        // Add play again button
-        const playAgainButton = this.add.rectangle(
-            this.cameras.main.width / 2,
-            520,
-            200,
-            60,
-            0x4CAF50
-        ).setInteractive();
-        
-        this.add.text(
-            this.cameras.main.width / 2, 
-            520, 
-            'Play Again', 
-            { 
-                font: '24px Arial',
-                fill: '#ffffff' 
-            }
-        ).setOrigin(0.5);
-        
-        // Make button interactive
-        playAgainButton.on('pointerover', () => {
-            playAgainButton.fillColor = 0x3E8E41;
-        });
-        playAgainButton.on('pointerout', () => {
-            playAgainButton.fillColor = 0x4CAF50;
-        });
-        playAgainButton.on('pointerdown', () => {
-            GameData.reset();
-            this.scene.start('MenuScene');
+        // Animate the score appearance
+        this.tweens.add({
+            targets: finalScore,
+            scale: 1,
+            duration: 1000,
+            ease: 'Bounce.out'
         });
     }
     
