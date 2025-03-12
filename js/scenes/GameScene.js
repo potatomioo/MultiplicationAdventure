@@ -14,6 +14,7 @@ class GameScene extends Phaser.Scene {
         this.characterPosition = 0;
         this.showingHint = false;
         this.allowInput = true;
+        this.wrongAnswerCount = 0;
     }
 
     create() {
@@ -197,95 +198,102 @@ class GameScene extends Phaser.Scene {
         });
     }
     
-    // Modify checkAnswer to use the hurt animation
-    // Modify checkAnswer to use the hurt animation
-checkAnswer() {
-    if (this.userAnswer === '') {
-        this.feedbackText.setText('Please enter an answer!');
-        this.feedbackText.setFill('#ff0000');
-        this.feedbackText.setVisible(true);
-        return;
-    }
-    
-    const userNum = parseInt(this.userAnswer);
-    
-    if (userNum === this.currentProblem.answer) {
-        // Correct answer
-        this.feedbackText.setText('Correct! 🎉');
-        this.feedbackText.setFill('#00aa00');
-        this.feedbackText.setVisible(true);
-        
-        // Update score
-        GameData.score += 10 + GameData.level * 5;
-        this.scoreText.setText(`Score: ${GameData.score}`);
-        
-        // Update stars
-        this.problemsSolved++;
-        GameData.stars = this.problemsSolved;
-        
-        // Update star visuals
-        const stars = this.starsGroup.getChildren();
-        if (stars[this.problemsSolved - 1]) {
-            stars[this.problemsSolved - 1].fillColor = 0xFFD700;
-            
-            // Add a little animation to the star
-            this.tweens.add({
-                targets: stars[this.problemsSolved - 1],
-                scale: { from: 1, to: 1.5 },
-                duration: 300,
-                yoyo: true,
-                onComplete: () => {
-                    stars[this.problemsSolved - 1].setScale(1);
-                }
-            });
+    checkAnswer() {
+        if (this.userAnswer === '') {
+            this.feedbackText.setText('Please enter an answer!');
+            this.feedbackText.setFill('#ff0000');
+            this.feedbackText.setVisible(true);
+            return;
         }
         
-        // Temporarily disable input
-        this.allowInput = false;
+        const userNum = parseInt(this.userAnswer);
         
-        // Move character forward
-        this.moveCharacter();
-        
-        // Check if level is complete
-        if (this.problemsSolved >= GameData.levelConfig[GameData.level - 1].problemsToSolve) {
-            // Stop timer
-            if (this.timer) {
-                this.timer.remove();
+        if (userNum === this.currentProblem.answer) {
+            // Correct answer - reset wrong answer counter
+            this.wrongAnswerCount = 0;
+            
+            // Correct answer
+            this.feedbackText.setText('Correct! 🎉');
+            this.feedbackText.setFill('#00aa00');
+            this.feedbackText.setVisible(true);
+            
+            // Update score
+            GameData.score += 10 + GameData.level * 5;
+            this.scoreText.setText(`Score: ${GameData.score}`);
+            
+            // Update stars
+            this.problemsSolved++;
+            GameData.stars = this.problemsSolved;
+            
+            // Update star visuals
+            const stars = this.starsGroup.getChildren();
+            if (stars[this.problemsSolved - 1]) {
+                stars[this.problemsSolved - 1].fillColor = 0xFFD700;
+                
+                // Add a little animation to the star
+                this.tweens.add({
+                    targets: stars[this.problemsSolved - 1],
+                    scale: { from: 1, to: 1.5 },
+                    duration: 300,
+                    yoyo: true,
+                    onComplete: () => {
+                        stars[this.problemsSolved - 1].setScale(1);
+                    }
+                });
             }
             
-            // Wait a moment before transitioning
-            this.time.delayedCall(2000, () => {
-                // Check if this is the last level
-                if (GameData.level >= GameData.totalLevels) {
-                    this.scene.start('GameCompleteScene');
-                } else {
-                    this.scene.start('LevelCompleteScene');
+            // Temporarily disable input
+            this.allowInput = false;
+            
+            // Move character forward
+            this.moveCharacter();
+            
+            // Check if level is complete
+            if (this.problemsSolved >= GameData.levelConfig[GameData.level - 1].problemsToSolve) {
+                // Stop timer
+                if (this.timer) {
+                    this.timer.remove();
                 }
-            });
+                
+                // Wait a moment before transitioning
+                this.time.delayedCall(2000, () => {
+                    // Check if this is the last level
+                    if (GameData.level >= GameData.totalLevels) {
+                        this.scene.start('GameCompleteScene');
+                    } else {
+                        this.scene.start('LevelCompleteScene');
+                    }
+                });
+            } else {
+                // Continue to next problem after a delay
+                this.time.delayedCall(2000, () => {
+                    this.allowInput = true;
+                    this.generateProblem();
+                });
+            }
         } else {
-            // Continue to next problem after a delay
-            this.time.delayedCall(2000, () => {
-                this.allowInput = true;
-                this.generateProblem();
-            });
+            // Incorrect answer
+            this.wrongAnswerCount++;
+            this.feedbackText.setText('Try again!');
+            this.feedbackText.setFill('#ff0000');
+            this.feedbackText.setVisible(true);
+            
+            // Show hurt animation
+            this.showIncorrectAnimation();
+            
+            // Check if 3 wrong answers in a row
+            if (this.wrongAnswerCount >= 3) {
+                this.handleGameOver("Too many wrong answers!");
+            } else {
+                // Show hint button after first attempt
+                this.hintButton.setVisible(true);
+                
+                // Clear answer
+                this.userAnswer = '';
+                this.updateAnswerDisplay();
+            }
         }
-    } else {
-        // Incorrect answer with animation
-        this.feedbackText.setText('Try again!');
-        this.feedbackText.setFill('#ff0000');
-        this.feedbackText.setVisible(true);
-        
-        // Show hurt animation
-        this.showIncorrectAnimation();
-        
-        // Show hint button after first attempt
-        this.hintButton.setVisible(true);
-        
-        // Clear answer
-        this.userAnswer = '';
-        this.updateAnswerDisplay();
     }
-}
     
     drawTree(graphics, x, y, scale = 1) {
         // Draw tree trunk
@@ -810,29 +818,92 @@ checkAnswer() {
         // Time's up
         if (this.timeLeft <= 0) {
             this.timer.remove();
-            this.feedbackText.setText("Time's up! Let's try a new problem.");
-            this.feedbackText.setFill('#ff0000');
-            this.feedbackText.setVisible(true);
-            
-            // Temporarily disable input
-            this.allowInput = false;
-            
-            // Continue to next problem after a delay
-            this.time.delayedCall(2000, () => {
-                this.allowInput = true;
-                this.generateProblem();
-                
-                // Restart timer
-                const levelData = GameData.levelConfig[GameData.level - 1];
-                this.timeLeft = levelData.timePerProblem;
-                this.timer = this.time.addEvent({
-                    delay: 1000,
-                    callback: this.updateTimer,
-                    callbackScope: this,
-                    loop: true
-                });
-            });
+            this.handleGameOver("Time's up!");
         }
+    }
+
+    handleGameOver(message) {
+        // Stop any active timers
+        if (this.timer) {
+            this.timer.remove();
+        }
+        
+        // Disable input
+        this.allowInput = false;
+        
+        // Create popup overlay
+        this.createGameOverPopup(message);
+    }
+    
+    createGameOverPopup(message) {
+        // Create semi-transparent overlay
+        const overlay = this.add.rectangle(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2,
+            this.cameras.main.width,
+            this.cameras.main.height,
+            0x000000,
+            0.7
+        );
+        
+        // Create popup panel
+        const popup = this.add.rectangle(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2,
+            400,
+            250,
+            0xFFFFFF,
+            0.9
+        ).setOrigin(0.5);
+        
+        // Add message text
+        const messageText = this.add.text(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2 - 50,
+            message,
+            {
+                font: 'bold 32px Arial',
+                fill: '#FF0000',
+                align: 'center'
+            }
+        ).setOrigin(0.5);
+        
+        // Add restart button
+        const restartButton = this.add.rectangle(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2 + 50,
+            200,
+            60,
+            0x4CAF50
+        ).setInteractive();
+        
+        this.add.text(
+            this.cameras.main.width / 2,
+            this.cameras.main.height / 2 + 50,
+            'Restart Level',
+            {
+                font: '24px Arial',
+                fill: '#FFFFFF'
+            }
+        ).setOrigin(0.5);
+        
+        // Add button functionality
+        restartButton.on('pointerdown', () => {
+            // Reset level (keep current level but start fresh)
+            this.scene.start('LevelIntroScene');
+        });
+        
+        // Add popup elements to a group for potential animations
+        const popupGroup = this.add.group([overlay, popup, messageText, restartButton]);
+        
+        // Animate popup appearing
+        popup.setScale(0);
+        this.tweens.add({
+            targets: popup,
+            scale: 1,
+            duration: 300,
+            ease: 'Back.out'
+        });
     }
     
     moveCharacter() {
