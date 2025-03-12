@@ -8,6 +8,9 @@ class LevelCompleteScene extends Phaser.Scene {
     create() {
         const completedLevelData = GameData.levelConfig[GameData.level - 1];
         const nextLevelData = GameData.levelConfig[GameData.level];
+
+        //sound
+        this.sound.play('Complete');
         
         // Add background with gradient overlay
         let backgroundKey;

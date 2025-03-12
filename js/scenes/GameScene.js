@@ -210,6 +210,7 @@ class GameScene extends Phaser.Scene {
         
         if (userNum === this.currentProblem.answer) {
             // Correct answer - reset wrong answer counter
+            this.sound.play('CorrectAnswer');
             this.wrongAnswerCount = 0;
             
             // Correct answer
@@ -272,6 +273,7 @@ class GameScene extends Phaser.Scene {
                 });
             }
         } else {
+            this.sound.play('WrongAnswer');
             // Incorrect answer
             this.wrongAnswerCount++;
             this.feedbackText.setText('Try again!');
@@ -823,6 +825,9 @@ class GameScene extends Phaser.Scene {
         if (this.timer) {
             this.timer.remove();
         }
+        
+        // Play game over sound
+        this.sound.play('Over');
         
         // Disable input
         this.allowInput = false;

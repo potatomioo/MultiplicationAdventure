@@ -12,6 +12,18 @@ class MenuScene extends Phaser.Scene {
             .setScale(this.cameras.main.width / 3000, this.cameras.main.height / 3000)
             .setAlpha(1);
         
+        if (!this.game.registry.get('backgroundMusicPlaying')) {
+            const music = this.sound.add('BGMusic', {
+                volume: 0.5,
+                loop: true
+            });
+            music.play();
+            
+            // Store music reference globally
+            this.game.registry.set('backgroundMusic', music);
+            this.game.registry.set('backgroundMusicPlaying', true);
+        }
+
         // Add character to bottom left
         this.createCharacter();
         

@@ -8,6 +8,9 @@ class GameCompleteScene extends Phaser.Scene {
     create() {
         // Create a nice gradient background
         this.createGradientBackground(0x4a90e2, 0x8e44ad);
+
+        //sound
+        this.sound.play('Complete');
         
         // Add the Game Complete UI
         const acUI = this.add.image(
