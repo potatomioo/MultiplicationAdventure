@@ -476,15 +476,15 @@ class GameScene extends Phaser.Scene {
             this.cameras.main.width / 2,
             250,
             'CheckButton'
-        ).setScale(0.25).setInteractive();
+        ).setScale(0.3).setInteractive();
         
         // Make button interactive
         this.checkButton.on('pointerover', () => {
-            this.checkButton.setScale(0.3);
+            this.checkButton.setScale(0.4);
         });
         
         this.checkButton.on('pointerout', () => {
-            this.checkButton.setScale(0.25);
+            this.checkButton.setScale(0.3);
         });
         
         this.checkButton.on('pointerdown', () => {
