@@ -47,6 +47,40 @@ class LevelIntroScene extends Phaser.Scene {
         startButton.on('pointerdown', () => {
             this.scene.start('GameScene');
         });
+
+        this.createCharacter();
+    }
+
+    createCharacter() {
+        // Create character in bottom left
+        this.character = this.add.sprite(-50, 550, 'slide_1')
+            .setScale(0.15);
+        
+        // Play slide animation to enter screen
+        let slideIndex = 1;
+        const slideInterval = setInterval(() => {
+            this.character.setTexture(`slide_${slideIndex}`);
+            slideIndex++;
+            
+            if (slideIndex > 5) {
+                clearInterval(slideInterval);
+                
+                // After slide completes, play idle animation
+                let idleIndex = 1;
+                this.idleInterval = setInterval(() => {
+                    idleIndex = idleIndex % 10 + 1;
+                    this.character.setTexture(`idle_${idleIndex}`);
+                }, 100);
+            }
+        }, 100);
+        
+        // Move character into view
+        this.tweens.add({
+            targets: this.character,
+            x: 100,
+            duration: 600,
+            ease: 'Power2'
+        });
     }
     
     createLevelDecorations(levelData) {

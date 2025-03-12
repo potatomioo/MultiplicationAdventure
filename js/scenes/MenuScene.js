@@ -42,6 +42,38 @@ class MenuScene extends Phaser.Scene {
             // Start first level intro
             this.scene.start('LevelIntroScene');
         });
+        this.createCharacter();
+    }
+    createCharacter() {
+        // Create character in bottom left
+        this.character = this.add.sprite(-50, 550, 'slide_1')
+            .setScale(0.15);
+        
+        // Play slide animation to enter screen
+        let slideIndex = 1;
+        const slideInterval = setInterval(() => {
+            this.character.setTexture(`slide_${slideIndex}`);
+            slideIndex++;
+            
+            if (slideIndex > 5) {
+                clearInterval(slideInterval);
+                
+                // After slide completes, play idle animation
+                let idleIndex = 1;
+                this.idleInterval = setInterval(() => {
+                    idleIndex = idleIndex % 10 + 1;
+                    this.character.setTexture(`idle_${idleIndex}`);
+                }, 100);
+            }
+        }, 100);
+        
+        // Move character into view
+        this.tweens.add({
+            targets: this.character,
+            x: 100,
+            duration: 600,
+            ease: 'Power2'
+        });
     }
     
     createGradientBackground(color1, color2) {
@@ -124,34 +156,5 @@ class MenuScene extends Phaser.Scene {
                 }
             ).setOrigin(0.5);
         }
-    }
-    
-    createCharacter() {
-        // Create a simple animated character
-        const character = this.add.circle(100, 500, 20, 0xFF0000);
-        
-        // Add eyes and smile to make it look like a character
-        const leftEye = this.add.circle(93, 493, 4, 0x000000);
-        const rightEye = this.add.circle(107, 493, 4, 0x000000);
-        
-        // Create smile using arc
-        const smile = this.add.graphics();
-        smile.lineStyle(2, 0x000000, 1);
-        smile.beginPath();
-        smile.arc(100, 500, 12, 0.2, Math.PI - 0.2, false);
-        smile.strokePath();
-        
-        // Group all parts together
-        const characterGroup = this.add.group([character, leftEye, rightEye, smile]);
-        
-        // Add simple animation
-        this.tweens.add({
-            targets: characterGroup.getChildren(),
-            y: '-=20',
-            duration: 1000,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-        });
     }
 }
