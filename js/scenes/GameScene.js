@@ -821,14 +821,13 @@ class GameScene extends Phaser.Scene {
     }
 
     handleGameOver(message) {
+
         // Stop any active timers
         if (this.timer) {
             this.timer.remove();
         }
-        
         // Play game over sound
         this.sound.play('Over');
-        
         // Disable input
         this.allowInput = false;
         
